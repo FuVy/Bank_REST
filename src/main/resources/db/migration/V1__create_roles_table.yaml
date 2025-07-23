@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: fuvy
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(20)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - insert:
+            tableName: roles
+            columns:
+              - column: {name: id, value: "3eb53c3d-371d-4a6d-a835-3b584d6ee54d"}
+              - column: {name: name, value: 'USER' }
+        - insert:
+            tableName: roles
+            columns:
+              - column: {name: id, value: "cec0a9d9-bcb9-4769-93d4-fac653336bb1"}
+              - column: {name: name, value: 'ADMIN'}
