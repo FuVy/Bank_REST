@@ -15,6 +15,9 @@
     jwt:
       secret: ${JWT_SECRET:Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
       validity-seconds: ${JWT_VALIDITY:1800}
+    encryption:
+      secret: ${APP_ENCRYPTION_SECRET:Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
+      salt: ${APP_ENCRYPTION_SALT:ABCDEF0123456789ABCDEF0123456789}
 
 
 
