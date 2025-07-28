@@ -1,5 +1,6 @@
 package com.example.bankcards.exception;
 
+import com.example.bankcards.exception.card.InvalidCardOperationException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
