@@ -1,17 +1,27 @@
-spring:
-  datasource:
-    url: jdbc:h2:mem:bankdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  security:
-    user:
-      name: user
-      password: password
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  spring:
+    datasource:
+      url: jdbc:h2:mem:bankdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+    security:
+      user:
+        name: user
+        password: password
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
+    server:
+      port: 8080
 
+
+  app:
+    jwt:
+      secret: Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl
+      validity-seconds: 1800
+    encryption:
+      secret: Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl
+      salt: ABCDEF0123456789ABCDEF0123456789

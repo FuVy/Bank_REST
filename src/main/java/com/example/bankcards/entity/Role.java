@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Table(name = "roles")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Role {

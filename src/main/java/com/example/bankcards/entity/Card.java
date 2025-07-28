@@ -2,20 +2,22 @@ package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @ToString
-@RequiredArgsConstructor
 @Table(name = "cards")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,4 +42,16 @@ public class Card {
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    public Card(String encryptedCardNumber, User owner, LocalDate expiryDate, CardStatus status, BigDecimal balance) {
+        this.encryptedCardNumber = encryptedCardNumber;
+        this.owner = owner;
+        this.expiryDate = expiryDate;
+        this.status = status;
+        this.balance = balance;
+    }
 }
