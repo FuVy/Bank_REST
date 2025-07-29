@@ -32,7 +32,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "User authenticated successfully",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = JwtAuthResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials",
+            @ApiResponse(responseCode = "400", description = "Invalid credentials",
                     content = @Content),
             @ApiResponse(responseCode = "400", description = "Invalid request payload",
                     content = @Content)
