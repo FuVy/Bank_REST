@@ -1,6 +1,7 @@
 package com.example.bankcards.exception;
 
 import com.example.bankcards.exception.card.InvalidCardOperationException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
@@ -117,5 +118,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsErrors(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials.");
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpiredJwt(ExpiredJwtException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Expired JWT.");
     }
 }
