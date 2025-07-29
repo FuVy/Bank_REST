@@ -1,9 +1,48 @@
-# 
-# docker-compose.yml — определяет сервисы для разработки и тестирования.
+services:
+  bank_rest:
+    build: .
+    container_name: bank_rest_app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=bank_rest
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-postgres}
+      - SPRING_SERVER_PORT=8080
 
-Что нужно сделать:
-  - Настроить сервисы для:
-      - PostgreSQL (или MySQL) с начальной базой.
-      - Приложения Spring Boot (если нужно).
-  - Открыть нужные порты (например, 5432, 8080).
-  - Настроить volume для хранения данных БД.
+      - JWT_SECRET=${JWT_SECRET:-Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
+      - JWT_VALIDITY=${JWT_VALIDITY:-1800}
+
+      - APP_ENCRYPTION_SECRET=${APP_ENCRYPTION_SECRET:-Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
+      - APP_ENCRYPTION_SALT=${APP_ENCRYPTION_SALT:-ABCDEF0123456789ABCDEF0123456789}
+
+      - APP_MASTER_PASSWORD=${APP_MASTER_PASSWORD:-password}
+
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres_db:5432/bankdb}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-user}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-password}
+
+    depends_on:
+      - postgres_db
+    networks:
+      - bank_network
+
+  postgres_db:
+    image: postgres:13-alpine
+    container_name: bank_postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${SPRING_DATASOURCE_DB:-bankdb}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME:-user}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bank_network
+
+volumes:
+  postgres_data:
+
+networks:
+  bank_network:
+    driver: bridge
