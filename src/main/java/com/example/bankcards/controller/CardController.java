@@ -37,9 +37,11 @@ public class CardController {
             @ApiResponse(responseCode = "201", description = "Card created successfully",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CardDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload or User not found",
+            @ApiResponse(responseCode = "400", description = "Invalid request payload",
                     content = @Content),
             @ApiResponse(responseCode = "403", description = "Forbidden - Requires ADMIN role",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content)
     })
     @PostMapping
