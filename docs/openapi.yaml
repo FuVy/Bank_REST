@@ -1,1 +1,606 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.1.0
+info:
+  title: Bank Cards Api
+  description: desc
+  version: "1.0"
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Transfers
+  description: Operations for transferring money between cards
+- name: User Management
+  description: APIs for managing users (Admin only)
+- name: Cards
+  description: Operations related to bank cards
+- name: Authentication
+  description: User authentication and registration APIs
+paths:
+  /api/v1/transfers/user/{userId}:
+    post:
+      tags:
+      - Transfers
+      summary: Transfer money between cards owned by a specific user
+      operationId: transferBetweenUserOwnedCards
+      parameters:
+      - name: userId
+        in: path
+        description: ID of the user performing the transfer
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+        required: true
+      responses:
+        "204":
+          description: Transfer successful
+        "400":
+          description: "Invalid transfer operation (e.g., insufficient balance, inactive\
+            \ card, same card)"
+        "404":
+          description: User or Card not found
+        "403":
+          description: Forbidden - User does not own one or both cards
+      security:
+      - bearerAuth: []
+  /api/v1/cards:
+    get:
+      tags:
+      - Cards
+      summary: Get all cards with optional filtering and pagination (Admin only)
+      operationId: getAllCards
+      parameters:
+      - name: page
+        in: query
+        description: Page number (1-based index)
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 1
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: asc
+        in: query
+        description: "Sort by creation date in ascending order (true for ASC, false\
+          \ for DESC)"
+        required: false
+        schema:
+          type: boolean
+          default: false
+        example: false
+      - name: searchRequest
+        in: query
+        description: Search criteria for cards
+        required: true
+        schema:
+          $ref: "#/components/schemas/CardSearchRequest"
+      responses:
+        "200":
+          description: Successfully retrieved list of cards
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "403":
+          description: Forbidden - Requires ADMIN role
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - Cards
+      summary: Create a new card (Admin only)
+      operationId: createCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCardRequest"
+        required: true
+      responses:
+        "201":
+          description: Card created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "400":
+          description: Invalid request payload or User not found
+        "403":
+          description: Forbidden - Requires ADMIN role
+      security:
+      - bearerAuth: []
+  /api/v1/auth/register:
+    post:
+      tags:
+      - Authentication
+      summary: Register a new user and get JWT token
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwtAuthResponse"
+        "409":
+          description: User with given username already exists
+        "400":
+          description: Invalid request payload
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Authenticate user and get JWT token
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: User authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwtAuthResponse"
+        "401":
+          description: Invalid credentials
+        "400":
+          description: Invalid request payload
+  /api/v1/users/{id}:
+    delete:
+      tags:
+      - User Management
+      summary: Delete a user
+      description: Delete a user by their ID.
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: User deleted successfully.
+        "404":
+          description: User not found.
+        "403":
+          description: Forbidden - only ADMIN can delete users.
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - User Management
+      summary: Update user data
+      description: "Update user's username, roles, and manage owned cards (append/remove)."
+      operationId: updateUserData
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditUserRequest"
+        required: true
+      responses:
+        "200":
+          description: User updated successfully.
+        "400":
+          description: Invalid input.
+        "404":
+          description: User not found.
+        "409":
+          description: Username already taken.
+        "403":
+          description: Forbidden - only ADMIN can update other users.
+      security:
+      - bearerAuth: []
+  /api/v1/cards/{cardId}/status:
+    patch:
+      tags:
+      - Cards
+      summary: Change the status of a card (Admin only)
+      operationId: changeCardStatus
+      parameters:
+      - name: cardId
+        in: path
+        description: ID of the card to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCardStatusRequest"
+        required: true
+      responses:
+        "204":
+          description: Card status changed successfully
+        "404":
+          description: Card not found
+        "409":
+          description: Card status is already set to the requested status
+        "400":
+          description: Invalid request payload
+        "403":
+          description: Forbidden - Requires ADMIN role
+      security:
+      - bearerAuth: []
+  /api/v1/cards/{cardId}/block:
+    patch:
+      tags:
+      - Cards
+      summary: User blocks their own card (Admin or Card owner)
+      operationId: userBlockCard
+      parameters:
+      - name: cardId
+        in: path
+        description: ID of the card to block
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Card blocked successfully
+        "404":
+          description: User or Card not found
+        "409":
+          description: Card is already blocked
+        "403":
+          description: Forbidden - Requires ADMIN role or user to be the card owner
+      security:
+      - bearerAuth: []
+  /api/v1/users:
+    get:
+      tags:
+      - User Management
+      summary: Get all users (paginated and sortable)
+      description: "Retrieve a paginated list of all users, sortable by creation date."
+      operationId: findAllUsers
+      parameters:
+      - name: pageNumber
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: pageSize
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: ascending
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+      responses:
+        "200":
+          description: Successfully retrieved list of users.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+        "403":
+          description: Forbidden - only ADMIN can access.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDto"
+      security:
+      - bearerAuth: []
+  /api/v1/users/username/{username}:
+    get:
+      tags:
+      - User Management
+      summary: Get user by username
+      description: Retrieve a specific user by their username.
+      operationId: getUserByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved user.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "404":
+          description: User not found.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "403":
+          description: Forbidden - only ADMIN can access.
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDto"
+      security:
+      - bearerAuth: []
+  /api/v1/cards/{cardId}:
+    get:
+      tags:
+      - Cards
+      summary: Get card details by ID (Admin only)
+      operationId: getCardById
+      parameters:
+      - name: cardId
+        in: path
+        description: ID of the card to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved card details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "404":
+          description: Card not found
+        "403":
+          description: Forbidden - Requires ADMIN role
+      security:
+      - bearerAuth: []
+  /api/v1/cards/user/{userId}:
+    get:
+      tags:
+      - Cards
+      summary: Get all cards for a specific user (Admin or User owning the cards)
+      operationId: getAllCardsForUser
+      parameters:
+      - name: userId
+        in: path
+        description: ID of the user
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Page number (1-based index)
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 1
+      - name: size
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: asc
+        in: query
+        description: "Sort by creation date in ascending order (true for ASC, false\
+          \ for DESC)"
+        required: false
+        schema:
+          type: boolean
+          default: false
+        example: false
+      responses:
+        "200":
+          description: Successfully retrieved list of cards for the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardDto"
+        "404":
+          description: User not found
+        "403":
+          description: Forbidden - Requires ADMIN role or user to be the owner
+      security:
+      - bearerAuth: []
+  /api/v1/cards/{id}:
+    delete:
+      tags:
+      - Cards
+      summary: Delete a card (Admin only)
+      description: Admin can delete any card by its ID
+      operationId: deleteCard
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Card deleted successfully
+        "404":
+          description: Card not found
+        "403":
+          description: Forbidden - only ADMIN can delete cards
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    TransferRequest:
+      type: object
+      properties:
+        fromCardId:
+          type: string
+          format: uuid
+        toCardId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          minimum: 0.01
+      required:
+      - fromCardId
+      - toCardId
+    CreateCardRequest:
+      type: object
+      properties:
+        cardNumber:
+          type: string
+          minLength: 1
+          pattern: "^\\d{16}$"
+        ownerId:
+          type: string
+          format: uuid
+          minLength: 1
+        expiryDate:
+          type: string
+          format: date
+        initialBalance:
+          type: number
+          minimum: 0.0
+      required:
+      - cardNumber
+      - expiryDate
+      - initialBalance
+      - ownerId
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        maskedCardNumber:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        expiryDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+        balance:
+          type: number
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 50
+          minLength: 3
+        password:
+          type: string
+          maxLength: 100
+          minLength: 6
+      required:
+      - password
+      - username
+    JwtAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - password
+      - username
+    EditUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 50
+          minLength: 3
+    UpdateCardStatusRequest:
+      type: object
+      properties:
+        newStatus:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+      required:
+      - newStatus
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    CardSearchRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - BLOCKED
+          - EXPIRED
+        expiryDate:
+          type: string
+          format: date
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT authentication token
+      scheme: bearer
+      bearerFormat: JWT
