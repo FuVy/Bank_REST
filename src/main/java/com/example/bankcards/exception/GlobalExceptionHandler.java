@@ -1,15 +1,11 @@
 package com.example.bankcards.exception;
 
-import com.example.bankcards.exception.card.InvalidCardOperationException;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterErrors;
@@ -103,25 +99,5 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<?> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(InvalidCardOperationException.class)
-    public ResponseEntity<?> handleInvalidCardOperationException(InvalidCardOperationException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDeniedErrors(AccessDeniedException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentialsErrors(BadCredentialsException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials.");
-    }
-
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<String> handleExpiredJwt(ExpiredJwtException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Expired JWT.");
     }
 }

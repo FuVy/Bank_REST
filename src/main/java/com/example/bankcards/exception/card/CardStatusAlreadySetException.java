@@ -5,12 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class CardStatusAlreadySetException extends InvalidCardOperationException {
-    public CardStatusAlreadySetException(String message) {
-        super(message);
-    }
-
+@ResponseStatus(HttpStatus.CONFLICT)
+public class CardStatusAlreadySetException extends RuntimeException {
     public CardStatusAlreadySetException(UUID id) {
         super(String.format("Card status already set for id: %s.", id));
     }
