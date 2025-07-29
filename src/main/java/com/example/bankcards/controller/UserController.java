@@ -50,6 +50,18 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+    @Operation(summary = "Get user by ID", description = "Retrieve a specific user by their ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user."),
+            @ApiResponse(responseCode = "404", description = "User not found."),
+            @ApiResponse(responseCode = "403", description = "Forbidden - only ADMIN can access.")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
+        UserDto userDto = userService.findById(id);
+        return ResponseEntity.ok(userDto);
+    }
+
     @Operation(summary = "Update user data", description = "Update user's username, roles, and manage owned cards (append/remove).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User updated successfully."),

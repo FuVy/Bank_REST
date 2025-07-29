@@ -97,6 +97,25 @@ class UserControllerTest {
     }
 
     @Test
+    void getUserById_existingUser_shouldReturnOkAndUserDto() throws Exception {
+        when(userService.findById(eq(userId))).thenReturn(userDto);
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.username").value(username));
+    }
+
+    @Test
+    void getUserById_nonExistingUser_shouldReturnNotFound() throws Exception {
+        when(userService.findById(eq(userId)))
+                .thenThrow(new UserNotFoundException(userId));
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void updateUserData_validRequest_shouldReturnNoContent() throws Exception {
         doNothing().when(userService).updateUser(eq(userId), any(EditUserRequest.class));
 

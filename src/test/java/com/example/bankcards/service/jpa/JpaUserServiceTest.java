@@ -102,6 +102,32 @@ class JpaUserServiceTest {
     }
 
     @Test
+    void findById_existingUser_shouldReturnUserDto() {
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userMapper.toDto(user)).thenReturn(userDto);
+
+        UserDto result = jpaUserService.findById(userId);
+
+        assertNotNull(result);
+        assertEquals(username, result.getUsername());
+        verify(userRepository).findById(userId);
+        verify(userMapper).toDto(user);
+    }
+
+    @Test
+    void findById_nonExistingUser_shouldThrowUserNotFoundException() {
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () -> {
+            jpaUserService.findById(userId);
+        });
+
+        assertEquals("User not found with ID: " + userId + ".", thrown.getMessage());
+        verify(userRepository).findById(userId);
+        verifyNoInteractions(userMapper);
+    }
+
+    @Test
     void findAllUsers_shouldReturnListOfUserDto() {
         Page<User> userPage = new PageImpl<>(List.of(user));
         when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);

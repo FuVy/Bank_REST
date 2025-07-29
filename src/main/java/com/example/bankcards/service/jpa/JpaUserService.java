@@ -43,6 +43,14 @@ public class JpaUserService implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('" + RoleConsts.ADMIN + "') or " +
+            "(#id.equals(authentication.principal.uuid))")
+    public UserDto findById(UUID id) {
+        return userMapper.toDto(userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id)));
+    }
+
+    @Override
     @PreAuthorize("hasRole('" + RoleConsts.ADMIN + "')")
     @Transactional(readOnly = true)
     public List<UserDto> findAllUsers(Integer pageNumber, Integer pageSize, boolean ascendingCreationDate) {
