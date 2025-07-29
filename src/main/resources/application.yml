@@ -1,33 +1,27 @@
-  spring:
-    application:
-      name: bank_rest
-    jpa:
-      hibernate:
-        ddl-auto: validate
-    liquibase:
-      change-log: classpath:db/migration/db.changelog-master.yaml
-    profiles:
-      active: h2
-    server:
-      port: ${SPRING_SERVER_PORT:8080}
+spring:
+  application:
+    name: bank_rest
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/migration/db.changelog-master.yaml
+  profiles:
+    active: h2
+  server:
+    port: ${SPRING_SERVER_PORT:8080}
 
-  springdoc:
-    api-docs:
-      enabled: true
-      path: /api-docs
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
 
-  app:
-    jwt:
-      secret: ${JWT_SECRET:Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
-      validity-seconds: ${JWT_VALIDITY:1800}
-    encryption:
-      secret: ${APP_ENCRYPTION_SECRET:Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl}
-      salt: ${APP_ENCRYPTION_SALT:ABCDEF0123456789ABCDEF0123456789}
-    master-access:
-      password: ${APP_MASTER_PASSWORD}
-
-#Что нужно сделать:
-#  - Указать настройки подключения к базе данных.
-#  - Указать порт приложения.
-#  - Настроить параметры безопасности и JWT.
-#  - Включить Swagger UI.
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    validity-seconds: ${JWT_VALIDITY:1800}
+  encryption:
+    secret: ${APP_ENCRYPTION_SECRET}
+    salt: ${APP_ENCRYPTION_SALT}
+  master-access:
+    password: ${APP_MASTER_PASSWORD}
