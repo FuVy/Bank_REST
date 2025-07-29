@@ -32,10 +32,17 @@ public class JpaTransferService implements TransferService {
             throw new UserNotFoundException(userId);
         }
 
-        Card fromCard = cardRepository.findById(request.getFromCardId())
+        UUID fromId = request.getFromCardId();
+        UUID toId = request.getToCardId();
+
+        if (fromId.equals(toId)) {
+            throw new InvalidCardOperationException("Can't transfer money to the same card.");
+        }
+
+        Card fromCard = cardRepository.findById(fromId)
                 .orElseThrow(() -> new CardNotOwnedByUserException(request.getFromCardId(), userId));
-        Card toCard = cardRepository.findById(request.getToCardId())
-                .orElseThrow(() -> new CardNotOwnedByUserException(request.getFromCardId(), userId));
+        Card toCard = cardRepository.findById(toId)
+                .orElseThrow(() -> new CardNotOwnedByUserException(request.getToCardId(), userId));
 
         checkCardsForOwnership(userId, fromCard, toCard);
 
@@ -44,9 +51,6 @@ public class JpaTransferService implements TransferService {
         }
         if (toCard.getStatus() != CardStatus.ACTIVE) {
             throw new InvalidCardOperationException("Destination card is not active.");
-        }
-        if (fromCard.getId().equals(toCard.getId())) {
-            throw new InvalidCardOperationException("Can't transfer money to the same card.");
         }
         if (fromCard.getBalance().compareTo(request.getAmount()) < 0) {
             throw new InvalidCardOperationException("Insufficient balance on source card.");
