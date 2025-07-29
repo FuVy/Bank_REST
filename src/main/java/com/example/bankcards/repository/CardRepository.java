@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CardRepository extends JpaRepository<Card, UUID>, JpaSpecificationExecutor<Card> {
-    List<Card> findAllByOwner(UUID ownerId, Pageable pageable);
+    List<Card> findAllByOwner_Id(UUID ownerId, Pageable pageable);
 
     @Query("SELECT SUM(c.balance) FROM Card c WHERE c.owner.id = :userId")
     BigDecimal sumBalanceByOwnerId(@Param("userId") UUID userId);

@@ -89,7 +89,7 @@ public class JpaCardService implements CardService {
             throw new UserNotFoundException(userId);
         }
         Pageable pageable = buildPageRequest(pageNumber, pageSize, getCreationDateOrder(ascendingCreationDate));
-        return cardRepository.findAllByOwner(userId, pageable).stream().map(cardMapper::toDto).toList();
+        return cardRepository.findAllByOwner_Id(userId, pageable).stream().map(cardMapper::toDto).toList();
     }
 
     @Override

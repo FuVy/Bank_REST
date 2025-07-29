@@ -162,7 +162,7 @@ class JpaCardServiceTest {
     @Test
     void getAllCardsForUser_validUser_shouldReturnListOfCardDto() {
         when(userRepository.existsById(ownerId)).thenReturn(true);
-        when(cardRepository.findAllByOwner(eq(ownerId), any(Pageable.class))).thenReturn(List.of(card));
+        when(cardRepository.findAllByOwner_Id(eq(ownerId), any(Pageable.class))).thenReturn(List.of(card));
         when(cardMapper.toDto(any(Card.class))).thenReturn(cardDto);
 
         List<CardDto> result = jpaCardService.getAllCardsForUser(ownerId, 1, 10, true);
@@ -172,7 +172,7 @@ class JpaCardServiceTest {
         assertEquals(1, result.size());
         assertEquals(cardDto.getId(), result.get(0).getId());
         verify(userRepository).existsById(ownerId);
-        verify(cardRepository).findAllByOwner(eq(ownerId), any(Pageable.class));
+        verify(cardRepository).findAllByOwner_Id(eq(ownerId), any(Pageable.class));
         verify(cardMapper).toDto(card);
     }
 
