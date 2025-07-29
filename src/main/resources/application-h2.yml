@@ -25,3 +25,5 @@
     encryption:
       secret: Zm9vYmFyYmF6cXV4c29tZXJhbmRvbXN0cmluZ3RoaXNpc2p1c3RhbmV4YW1wbGV0b2RlbW9uc3RyYXRl
       salt: ABCDEF0123456789ABCDEF0123456789
+    master-access:
+      password: password
